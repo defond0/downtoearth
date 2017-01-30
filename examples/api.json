@@ -1,0 +1,32 @@
+{
+  "Name": "Book-API",
+  "Description": "An example API for books",
+  "AccountNumber": "[AWS ACCOUNT NUMBER]",
+  "LambdaZip": "dist/api-lambda.zip",
+  "LambdaHandler": "lambda_handler.lambda_handler",
+  "LambdaRuntime": "python2.7",
+  "AuthType": "AWS_IAM",
+  "Roles": {
+    "Default": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+          }
+        ]
+      }
+  },
+  "Defaults":{
+
+  },
+  "Api":{
+    "/v1/book": ["GET", "POST"],
+    "/v1/book/{isbn}": ["GET", "PUT", "DELETE"]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "Name": "DownToEarthApi",
+  "Description": "test API for the downtoearth tool",
+  "AccountNumber": "651193231129",
+  "LambdaZip": "dist/api-lambda.zip",
+  "LambdaHandler": "lambda_handler.lambda_handler",
+  "LambdaRuntime": "python2.7",
+  "AuthType": "AWS_IAM",
+  "Roles": {
+    "Default": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+          }
+        ]
+      }
+  },
+  "Defaults":{
+
+  },
+  "Api":{
+    "/api/X/{1}": ["GET"],
+    "/api/X": ["GET", "POST"],
+
+    "/api/Y": ["GET", "POST"],
+    "/api/Y/{1}": ["GET"]
+  }
+}
