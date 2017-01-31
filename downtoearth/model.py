@@ -10,6 +10,13 @@ from jinja2 import PackageLoader, Environment
 
 from downtoearth import default
 
+try:
+    # Modify raw_input to input if we're in Python 2.
+    input = raw_input
+except NameError as err:
+    if 'name \'raw_input\' is not defined' not in err.args[0]:
+        raise
+
 
 class ApiModel(object):
     """downtoearth data model."""
