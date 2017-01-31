@@ -102,35 +102,36 @@ class ApiModel(object):
     def run_stage_deployments(self):
         pass
 
-    def run_terraform(self):        
+    def run_terraform(self):
         """Return a apply terraform after template rendered."""
-        option_1 = None
-        option_2 = None
-        execute_type = None
-        generated_tf_location = self.args.output.rsplit('/', 1)[0]
-        while option_1 is None:
-            input_value_1 = raw_input("\n\nWould you like to automatically run terraform? [y/n] ")
-            option_1 = input_value_1
-        if option_1.lower() == "y":
-            while option_2 is None:
-                input_value_2 = raw_input("\n\nApply or plan? [apply/plan] ")
-                option_2 = input_value_2
-                if option_2.lower() == 'apply':
-                    subprocess.call('terraform apply ' + generated_tf_location, shell=True)
-                    self.run_stage_deployments()
-                elif option_2.lower() == 'plan':
-                    subprocess.call('terraform plan ' + generated_tf_location, shell=True) 
-                else:
-                    raise ValueError('{input} is not a valid option.'.format(input=input_value_2))
-        elif option_1.lower() == "n":
-            print '\n*************************************************************************'
-            print '\nCommand to generate plan:'
-            print 'terraform plan ' + generated_tf_location
-            print '\nCommand to apply: '
-            print 'terraform apply ' + generated_tf_location
-            print '\n*************************************************************************\n'
-        else:
-            raise ValueError('{input} is not a valid option.'.format(input=input_value_1))        
+        path = os.path.dirname(self.args.output)
+        affirm = ['true', 'y', 'yes']
+        decline = ['', 'false', 'n', 'no']
+        tf_cmds = {
+            'apply': 'terraform apply %s' % path,
+            'plan': 'terraform plan %s' % path
+        }
+        quit_cmds = ['q', 'quit']
+        while True:
+            run_tf = input("Run terraform? [y/N] ").lower()
+            if run_tf in affirm + decline:
+                run_tf = run_tf not in decline
+                break
+            print('Try again.')
+        if run_tf is True:
+            while True:
+                tf_cmd = input("terraform apply or plan? [apply/plan/quit] ")
+                if tf_cmd in tf_cmds:
+                    subprocess.call(tf_cmds[tf_cmd], shell=True)
+                    break
+                if tf_cmd.lower() in quit_cmds:
+                    break
+                print('Try again.')
+                self.run_stage_deployments()
+            return
+        print('command to show plan:\n\t{}'.format(tf_cmds['plan']))
+        print('command to apply:\n\t{}'.format(tf_cmds['apply']))
+
 
 class UrlTree(object):
     def __init__(self):
