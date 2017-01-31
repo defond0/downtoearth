@@ -1,6 +1,10 @@
 """downtoearth API model."""
 import json
-import subprocess
+import os
+try:
+    import subprocess32 as subprocess
+except ImportError: # no subprocess32 / Python 3 = safe to use subprocess
+    import subprocess
 
 from jinja2 import PackageLoader, Environment
 
