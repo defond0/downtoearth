@@ -2,6 +2,10 @@
 
 from setuptools import setup
 
+install_requires = [
+    'jinja2>=2.9.5'
+]
+
 setup(name='downtoearth',
       version='0.3.0',
       description='Utility to make API Gateway terraforms',
@@ -12,6 +16,7 @@ setup(name='downtoearth',
       package_data={'downtoearth': [
           'templates/*.hcl',
       ]},
+      install_requires=install_requires,
       setup_requires=['pytest-runner',],
       tests_require=[
           'pytest',
