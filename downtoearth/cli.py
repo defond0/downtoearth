@@ -20,6 +20,13 @@ def parse_args():
         action='store_true',
         help='Whether to run terraform apply (and post-hooks) on the generated state file'
     )
+    parser.add_argument(
+        '-s',
+        '--stage',
+        action='store_true',
+        default=None,
+        help='Give a stage to deploy lambda to, return terraform command'
+    )
     parser.add_argument('input')
     parser.add_argument('output')
     return parser.parse_args()
@@ -36,6 +43,8 @@ def main():
     print(output)
     if args.deploy:
         model.run_terraform()
+    if args.stage is not None:
+        model.run_stage_deployments(stage_to_deploy=args.stage)
 
 
 if __name__ == "__main__":

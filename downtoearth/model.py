@@ -2,6 +2,7 @@
 import json
 import subprocess
 
+from boto3 import client
 from jinja2 import PackageLoader, Environment
 
 from downtoearth import default
@@ -32,6 +33,19 @@ class ApiModel(object):
         self.url_root = UrlTree()
         for endpoint, methods in endpoint_keys:
             self.url_root.process_url(endpoint, methods)
+
+    def _get_lambda_name(self):
+        return "{0}_root".format(self.name)
+
+    def get_current_alias_versions(self):
+        lambdas = client('lambdas')
+        return [
+            lambdas.get_alias(
+                FunctionName=self._get_lambda_name(),
+                Name=stage
+            )
+            for stage in self.json.get('Stages', ['production'])
+        ]
 
     def get_endpoints(self):
         """Get all paths that contain methods."""
@@ -88,10 +102,42 @@ class ApiModel(object):
         template = self.jinja_env.get_template('root.hcl')
         return template.render(**self.get_api_template_variables())
 
-    def run_stage_deployments(self):
-        pass
+    def run_stage_deployments(self, stage_to_deploy=None):
+        """Return a apply terraform command to use after deploying your lambda to supplied stage"""
+        cmd = "{stages} terraform apply {file_location}"
+        lambda_zip = self.json.get('LambdaZip', None)
+        if lambda_zip is None:
+            raise ValueError('LambdaZip not provided in configuration')
+        lambdas = client('lambdas')
+        with open(lambda_zip, 'rb') as lz:
+            res = lambdas.update_function_code(
+                FunctionName=self._get_lambda_name(),
+                ZipFile=lz,
+                Publish=True
+            )
+        version = res['Version']
+        lambdas.update_alias(
+            FunctionName=self._get_lambda_name(),
+            Name=stage_to_deploy,
+            FunctionVersion=version,
+            Descriptions='DTE stage deploy'
+        )
+        stg_lst = []
+        terraform_variables = " "
+        stages = self.get_current_alias_versions()
+        for stage in stages:
+            sub_cmd = "TF_VAR_{stage_name}_version={version}".format(
+                stage_name=stage['Name'],
+                version=stage['FunctionVersion']
+            )
+            stg_lst.append(sub_cmd)
+        terraform_variables = terraform_variables.join(stg_lst)
+        return cmd.format(
+            stages=terraform_variables,
+            file_location=self.args.output
+        )
 
-    def run_terraform(self):        
+    def run_terraform(self):
         """Return a apply terraform after template rendered."""
         option_1 = None
         option_2 = None
@@ -105,10 +151,10 @@ class ApiModel(object):
                 input_value_2 = raw_input("\n\nApply or plan? [apply/plan] ")
                 option_2 = input_value_2
                 if option_2.lower() == 'apply':
-                    subprocess.call('terraform apply ' + generated_tf_location, shell=True)
                     self.run_stage_deployments()
+                    subprocess.call('terraform apply ' + generated_tf_location, shell=True)
                 elif option_2.lower() == 'plan':
-                    subprocess.call('terraform plan ' + generated_tf_location, shell=True) 
+                    subprocess.call('terraform plan ' + generated_tf_location, shell=True)
                 else:
                     raise ValueError('{input} is not a valid option.'.format(input=input_value_2))
         elif option_1.lower() == "n":
@@ -119,7 +165,7 @@ class ApiModel(object):
             print 'terraform apply ' + generated_tf_location
             print '\n*************************************************************************\n'
         else:
-            raise ValueError('{input} is not a valid option.'.format(input=input_value_1))        
+            raise ValueError('{input} is not a valid option.'.format(input=input_value_1))
 
 class UrlTree(object):
     def __init__(self):
