@@ -4,6 +4,7 @@ resource "aws_lambda_function" "{{API_NAME}}_Lambda" {
   runtime = "{{LAMBDA_RUNTIME}}"
   role = "${aws_iam_role.{{API_NAME}}_Role.arn}"
   timeout = 30
+  memory = {{LAMBDA_MEMORY}}
   filename = "{{LAMBDA_ZIP}}"
 }
 
