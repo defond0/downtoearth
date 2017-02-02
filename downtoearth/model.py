@@ -49,6 +49,7 @@ class ApiModel(object):
             "LAMBDA_ROLE": self.json.get('LambdaRole', 'NONE'),
             "LAMBDA_HANDLER": self.json['LambdaHandler'],
             "LAMBDA_RUNTIME": self.json.get('LambdaRuntime', 'python2.7'),
+            "LAMBDA_TIMEOUT": self.json.get('LambdaTimeout', 30),
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
             "STAGES": self.json.get('Stages', ['production'])

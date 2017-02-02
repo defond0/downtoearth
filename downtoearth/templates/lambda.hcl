@@ -3,7 +3,7 @@ resource "aws_lambda_function" "{{API_NAME}}_Lambda" {
   handler = "{{LAMBDA_HANDLER}}"
   runtime = "{{LAMBDA_RUNTIME}}"
   role = "${aws_iam_role.{{API_NAME}}_Role.arn}"
-  timeout = 30
+  timeout = {{LAMBDA_TIMEOUT}}
   filename = "{{LAMBDA_ZIP}}"
 }
 
