@@ -18,7 +18,7 @@ setup(name='downtoearth',
       ],
       entry_points={
           'console_scripts': [
-              'downtoearth = downtoearth.downtoearth_cli:main',
+              'downtoearth = downtoearth.cli:main',
           ]
       },
      )
