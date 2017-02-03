@@ -51,7 +51,8 @@ class ApiModel(object):
             "LAMBDA_RUNTIME": self.json.get('LambdaRuntime', 'python2.7'),
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
-            "STAGES": self.json.get('Stages', ['production'])
+            "STAGES": self.json.get('Stages', ['production']),
+            "STAGED": 'Stages' in self.json
         }
 
         if not isinstance(ret.get("STAGES"), list):
