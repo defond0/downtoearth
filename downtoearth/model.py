@@ -52,8 +52,8 @@ class ApiModel(object):
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
             "STAGES": self.json.get('Stages', ['production']),
-            "STAGED": 'Stages' in self.json
         }
+        ret["STAGED"] = ret["STAGES"] > 1
 
         if not isinstance(ret.get("STAGES"), list):
             raise TypeError("Stages must be a list of stage names")
