@@ -52,9 +52,9 @@ class ApiModel(object):
             "LAMBDA_TIMEOUT": self.json.get('LambdaTimeout', 30),
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
-            "STAGES": self.json.get('Stages', ['production']),
+            "STAGES": self.json.get('Stages', ['production'])
         }
-        ret["STAGED"] = ret["STAGES"] > 1
+        ret["STAGED"] = len(ret["STAGES"]) > 1
 
         if not isinstance(ret.get("STAGES"), list):
             raise TypeError("Stages must be a list of stage names")
