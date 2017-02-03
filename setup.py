@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='downtoearth',
-      version='0.3.1',
+      version='0.4.0',
       description='Utility to make API Gateway terraforms',
       author='ClearDATA',
       url='http://gitlab.eng.cleardata.com/serverless/downtoearth',
