@@ -7,7 +7,7 @@ install_requires = [
 ]
 
 setup(name='downtoearth',
-      version='0.3.0',
+      version='0.3.1',
       description='Utility to make API Gateway terraforms',
       author='ClearDATA',
       url='https://github.com/cleardataeng/downtoearth',

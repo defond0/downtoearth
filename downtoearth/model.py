@@ -57,13 +57,15 @@ class ApiModel(object):
             "API_ACCOUNT": self.json['AccountNumber'],
             "AUTH_TYPE": self.json.get('AuthType', 'NONE'),
             "LAMBDA_ZIP": self.json['LambdaZip'],
-            "LAMBDA_ROLE": self.json.get('LambdaRole', 'NONE'),
             "LAMBDA_HANDLER": self.json['LambdaHandler'],
+            "LAMBDA_MEMORY": self.json.get('LambdaMemory', 128),
             "LAMBDA_RUNTIME": self.json.get('LambdaRuntime', 'python2.7'),
+            "LAMBDA_TIMEOUT": self.json.get('LambdaTimeout', 30),
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
             "STAGES": self.json.get('Stages', ['production'])
         }
+        ret["STAGED"] = len(ret["STAGES"]) > 1
 
         if not isinstance(ret.get("STAGES"), list):
             raise TypeError("Stages must be a list of stage names")
