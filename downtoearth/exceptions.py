@@ -32,5 +32,5 @@ class NotFoundException(Exception):
 
 class NotImplementedException(Exception):
     def __init__(self, msg):
-        prefix = '[Not Found]'
+        prefix = '[Not Implemented]'
         super(NotImplementedException, self).__init__(prefix + ' ' + msg)
