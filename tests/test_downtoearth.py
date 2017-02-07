@@ -1,6 +1,7 @@
-from downtoearth.model import ApiModel
-import unittest
 import os
+import unittest
+
+from downtoearth.model import ApiModel
 
 
 class DteArgs:
