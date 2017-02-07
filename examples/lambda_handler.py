@@ -8,14 +8,14 @@ def post_book(event, context):
     return dict(response="Successfully added book.")
 
 def update_book(event, context):
-    return dict(response="Successfully updated book.")    
+    return dict(response="Successfully updated book.")
 
 def remove_book(event, context):
-    return dict(response="Successfully removed book.")  
+    return dict(response="Successfully removed book.")
 
 function_mapping = {
     "GET:/v1/book": get_all,
-    "POST:/v1/book": post_book,    
+    "POST:/v1/book": post_book,
     "GET:/v1/book/{isbn}": get_book,
     "PUT:/v1/book/{isbn}": update_book,
     "DELETE:/v1/book/{isbn}": remove_book

@@ -1,10 +1,21 @@
 """downtoearth API model."""
 import json
-import subprocess
+import os
+try:
+    import subprocess32 as subprocess
+except ImportError: # no subprocess32 / Python 3 = safe to use subprocess
+    import subprocess
 
 from jinja2 import PackageLoader, Environment
 
 from downtoearth import default
+
+try:
+    # Modify raw_input to input if we're in Python 2.
+    input = raw_input
+except NameError as err:
+    if 'name \'raw_input\' is not defined' not in err.args[0]:
+        raise
 
 
 class ApiModel(object):
@@ -46,13 +57,15 @@ class ApiModel(object):
             "API_ACCOUNT": self.json['AccountNumber'],
             "AUTH_TYPE": self.json.get('AuthType', 'NONE'),
             "LAMBDA_ZIP": self.json['LambdaZip'],
-            "LAMBDA_ROLE": self.json.get('LambdaRole', 'NONE'),
             "LAMBDA_HANDLER": self.json['LambdaHandler'],
+            "LAMBDA_MEMORY": self.json.get('LambdaMemory', 128),
             "LAMBDA_RUNTIME": self.json.get('LambdaRuntime', 'python2.7'),
+            "LAMBDA_TIMEOUT": self.json.get('LambdaTimeout', 30),
             "CORS": self.json.get('Cors', True),
             "COMPOSABLE": self.args.composable,
             "STAGES": self.json.get('Stages', ['production'])
         }
+        ret["STAGED"] = len(ret["STAGES"]) > 1
 
         if not isinstance(ret.get("STAGES"), list):
             raise TypeError("Stages must be a list of stage names")
@@ -91,35 +104,36 @@ class ApiModel(object):
     def run_stage_deployments(self):
         pass
 
-    def run_terraform(self):        
+    def run_terraform(self):
         """Return a apply terraform after template rendered."""
-        option_1 = None
-        option_2 = None
-        execute_type = None
-        generated_tf_location = self.args.output.rsplit('/', 1)[0]
-        while option_1 is None:
-            input_value_1 = raw_input("\n\nWould you like to automatically run terraform? [y/n] ")
-            option_1 = input_value_1
-        if option_1.lower() == "y":
-            while option_2 is None:
-                input_value_2 = raw_input("\n\nApply or plan? [apply/plan] ")
-                option_2 = input_value_2
-                if option_2.lower() == 'apply':
-                    subprocess.call('terraform apply ' + generated_tf_location, shell=True)
-                    self.run_stage_deployments()
-                elif option_2.lower() == 'plan':
-                    subprocess.call('terraform plan ' + generated_tf_location, shell=True) 
-                else:
-                    raise ValueError('{input} is not a valid option.'.format(input=input_value_2))
-        elif option_1.lower() == "n":
-            print '\n*************************************************************************'
-            print '\nCommand to generate plan:'
-            print 'terraform plan ' + generated_tf_location
-            print '\nCommand to apply: '
-            print 'terraform apply ' + generated_tf_location
-            print '\n*************************************************************************\n'
-        else:
-            raise ValueError('{input} is not a valid option.'.format(input=input_value_1))        
+        path = os.path.dirname(self.args.output)
+        affirm = ['true', 'y', 'yes']
+        decline = ['', 'false', 'n', 'no']
+        tf_cmds = {
+            'apply': 'terraform apply %s' % path,
+            'plan': 'terraform plan %s' % path
+        }
+        quit_cmds = ['q', 'quit']
+        while True:
+            run_tf = input("Run terraform? [y/N] ").lower()
+            if run_tf in affirm + decline:
+                run_tf = run_tf not in decline
+                break
+            print('Try again.')
+        if run_tf is True:
+            while True:
+                tf_cmd = input("terraform apply or plan? [apply/plan/quit] ")
+                if tf_cmd in tf_cmds:
+                    subprocess.call(tf_cmds[tf_cmd], shell=True)
+                    break
+                if tf_cmd.lower() in quit_cmds:
+                    break
+                print('Try again.')
+                self.run_stage_deployments()
+            return
+        print('command to show plan:\n\t{}'.format(tf_cmds['plan']))
+        print('command to apply:\n\t{}'.format(tf_cmds['apply']))
+
 
 class UrlTree(object):
     def __init__(self):
