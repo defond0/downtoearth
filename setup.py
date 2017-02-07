@@ -1,14 +1,23 @@
 #!/usr/bin/env python
-
 from setuptools import setup
+
+with open('VERSION') as version_file:
+    version = version_file.read().strip()
+
+with open('downtoearth/version.py', 'w') as f:
+    f.write("VERSION = '%s'\n" % version)
+
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
 install_requires = [
     'jinja2>=2.9.5'
 ]
 
 setup(name='downtoearth',
-      version='0.3.1',
+      version=version,
       description='Utility to make API Gateway terraforms',
+      long_description=readme,
       author='ClearDATA',
       url='https://github.com/cleardataeng/downtoearth',
       packages=['downtoearth'],

@@ -1,5 +1,6 @@
 .idea/
 *.pyc
+tests/test_api/main.tf
 
 # Created by https://www.gitignore.io/api/python
 
