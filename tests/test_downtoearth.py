@@ -4,10 +4,11 @@ import unittest
 from downtoearth.model import ApiModel
 
 
-class DteArgs:
+class DteArgs(object):
     def __init__(self, path, composable=False):
         self.input = path
         self.composable = composable
+
 
 class MyTestCase(unittest.TestCase):
     def setUp(self):
