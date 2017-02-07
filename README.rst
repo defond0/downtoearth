@@ -2,8 +2,6 @@
 downtoearth
 ===========
 
-.. highlight:: python
-
 A tool for generating APIs in AWS, powered by Lambda and API Gateway, backed by terraform.
 
 We're just hooking up http verbs to python functions... shouldn't be that tough.
@@ -57,7 +55,7 @@ string representing the verb and endpoint hit.
 This simple example will show you how to map that name to a python
 function.
 
-::
+.. code-block:: python
 
     def get_y(event, context):
         return dict(oh="yaaaaa!")
@@ -91,7 +89,7 @@ Router
 If your API is straightforward there is no reason to write your own router.
 We provide one. Your lambda code could be as simple as:
 
-::
+.. code-block:: python
 
     from downtoearth.router import Router
 
@@ -117,14 +115,14 @@ along with their official descriptions. To return a non-200 OK HTTP
 code, raise an exception with an official description bracketed at the
 beginning. For example, to return a 404:
 
-::
+.. code-block:: python
 
     if not found:
         raise ValueError('[Not Found] Could not find %s' % item_id)
 
 Or you can nicely handle responses from DynamoDB:
 
-::
+.. code-block:: python
 
     try:
         db.put_item(Item=item,
@@ -149,7 +147,7 @@ Exceptions
 We also provide exceptions helpers for you. If you are using the provided
 router you won't need this. If you write your own router, use them like this.
 
-::
+.. code-block:: python
 
     from downtoearth.exceptions import NotFoundException
 
@@ -159,7 +157,7 @@ router you won't need this. If you write your own router, use them like this.
 Creating the Terraform
 ----------------------
 
-::
+.. code-block:: python
 
     cli.py INPUT_API_DEFITION_PATH OUTPUT_TERRAFORM_PATH
     # or if you have it installed
@@ -172,7 +170,7 @@ By default, downtoearth with create a single "production" stage. Create
 multiple stages by providing an array of names to the Stages key of the
 config
 
-::
+.. code-block:: python
 
     "Stages": ["production", "develop"]
 
@@ -192,7 +190,7 @@ code, update the alias to point to that version. We will soon provide a
 downtoearth cli command to help you deploy a zip to a stage, but for
 now, here's a little ``./deploy.sh STAGE`` script to help
 
-::
+.. code-block:: shell
 
     #!/usr/bin/env bash
     STAGE=$1
