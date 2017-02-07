@@ -1,9 +1,10 @@
 ===========
-DownToEarth
+downtoearth
 ===========
-----------------------------
+
+.. highlight:: python
+
 A tool for generating APIs in AWS, powered by Lambda and API Gateway, backed by terraform.
-----------------------------
 
 We're just hooking up http verbs to python functions... shouldn't be that tough.
 
@@ -20,7 +21,7 @@ The api.json file
 
 A json file is used to define your api. From this, downtoearth will generate a terraform document.
 
-::
+.. code-block:: json
 
     {
       "Name": "DownToEarthApi",
@@ -84,12 +85,29 @@ function.
 TODO: it'd be awesome if this worked with decorators like flask or
 chalice.
 
-Router helper
--------------
+Router
+------
 
-We also provide a router for you that implements this API. See the `router section`_ in the documentation.
+If your API is straightforward there is no reason to write your own router.
+We provide one. Your lambda code could be as simple as:
 
-.. _router section: https://downtoearth.readthedocs.io/en/latest/usage.html#router
+::
+
+    from downtoearth.router import Router
+
+    ROUTE_MAP = {
+        "GET:/v1/book": get_all,
+        "POST:/v1/book": post_book,
+        "GET:/v1/book/{isbn}": get_book,
+        "PUT:/v1/book/{isbn}": update_book,
+        "DELETE:/v1/book/{isbn}": remove_book
+    }
+
+
+    def handle_event(event, context):
+        """Route and handle incoming event."""
+        router = Router(ROUTE_MAP)
+        return router.route_request(event, context)
 
 Returning different status codes
 --------------------------------
@@ -125,12 +143,18 @@ Currently, there is no way to return additional headers or a custom
 body. All non-200 integration responses just contain the lambda output
 errorMessage field.
 
-Exceptions Helpers
-------------------
+Exceptions
+----------
 
-We also provide exceptions helpers for you. See the `exceptions section`_ in the documentation.
+We also provide exceptions helpers for you. If you are using the provided
+router you won't need this. If you write your own router, use them like this.
 
-.. _router section: https://downtoearth.readthedocs.io/en/latest/usage.html#exceptions
+::
+
+    from downtoearth.exceptions import NotFoundException
+
+    if not found:
+        raise NotFoundException('Could not find %s' % item_id)
 
 Creating the Terraform
 ----------------------
