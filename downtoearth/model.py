@@ -147,10 +147,10 @@ class ApiModel(object):
         with open(path, 'w')  as var_file:
             var_file.write('\n'.join(intel))
 
-    def run_terraform(self, tfvar_file=None):
+    def run_terraform(self, tfvar_file):
         """Return a apply terraform after template rendered."""
         path = os.path.dirname(self.args.output)
-        tfvar_file = tfvar_file if tfvar_file is not None else os.path.join(path, 'terraform.tfvars')
+        tfvar_file = os.path.join(path, tfvar_file)
         self.get_lambda_versions_file(tfvar_file)
         affirm = ['true', 'y', 'yes']
         decline = ['', 'false', 'n', 'no']
