@@ -132,7 +132,6 @@ class ApiModel(object):
 
     def get_lambda_versions_file(self, path):
         """Save a tfvars file with current version of lambda stages"""
-        path = path if path is not None else os.path.dirname(self.args.output)
         stages = self.json.get('Stages', ['production'])
         name = self.lambda_name()
         lambda_client = boto3.client('lambda')
@@ -148,15 +147,16 @@ class ApiModel(object):
         with open(path, 'w')  as var_file:
             var_file.write('\n'.join(intel))
 
-    def run_terraform(self):
+    def run_terraform(self, tfvar_file=None):
         """Return a apply terraform after template rendered."""
         path = os.path.dirname(self.args.output)
-        self.get_lambda_versions_file(os.path.join(path, 'terraform.tfvars'))
+        tfvar_file = tfvar_file if tfvar_file is not None else os.path.join(path, 'terraform.tfvars')
+        self.get_lambda_versions_file(tfvar_file)
         affirm = ['true', 'y', 'yes']
         decline = ['', 'false', 'n', 'no']
         tf_cmds = {
-            'apply': 'terraform apply %s' % path,
-            'plan': 'terraform plan %s' % path
+            'apply': 'terraform apply -var-file={} {}'.format(tfvar_file, path),
+            'plan': 'terraform plan -var-file={} {}'.format(tfvar_file, path)
         }
         quit_cmds = ['q', 'quit']
         while True:
