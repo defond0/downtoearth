@@ -106,13 +106,13 @@ class ApiModel(object):
     def run_stage_deployment(self, stage):
         """Deploy lambda code to stage"""
         if stage not in self.json.get('Stages', ['production']):
-            raise ValueError('Need stage to deploy')
+            raise ValueError('Stage not in stages listed in json')
         lambda_client = boto3.client('lambda')
         name = self.lambda_name()
-        with open(self.json['LambdaZip'], 'rb') as zip_:
+        with open(self.json['LambdaZip'], 'w') as zip_:
             code = lambda_client.update_function_code(
                 FunctionName=name,
-                ZipFile=zip_
+                ZipFile=zip_.read()
             )
         version = lambda_client.publish_version(
             CodeSha256=code['CodeSha256'],
@@ -132,8 +132,9 @@ class ApiModel(object):
 
     def get_lambda_versions_file(self, path):
         """Save a tfvars file with current version of lambda stages"""
+        path = path if path is not None else os.path.dirname(self.args.output)
         stages = self.json.get('Stages', ['production'])
-        name = '{}_root'.format(self.name)
+        name = self.lambda_name()
         lambda_client = boto3.client('lambda')
         intel = []
         for stage in stages:
@@ -144,13 +145,13 @@ class ApiModel(object):
             intel.append(
                 '{0}_version={1}'.format(stage, res['FunctionVersion'])
             )
-        with os.path.join(path, 'terraform.tfvars') as var_file:
+        with open(path, 'w')  as var_file:
             var_file.write('\n'.join(intel))
 
     def run_terraform(self):
         """Return a apply terraform after template rendered."""
         path = os.path.dirname(self.args.output)
-        self.get_lambda_versions_file(path)
+        self.get_lambda_versions_file(os.path.join(path, 'terraform.tfvars'))
         affirm = ['true', 'y', 'yes']
         decline = ['', 'false', 'n', 'no']
         tf_cmds = {
@@ -173,7 +174,6 @@ class ApiModel(object):
                 if tf_cmd.lower() in quit_cmds:
                     break
                 print('Try again.')
-                self.run_stage_deployments()
             return
         print('command to show plan:\n\t{}'.format(tf_cmds['plan']))
         print('command to apply:\n\t{}'.format(tf_cmds['apply']))
