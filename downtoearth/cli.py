@@ -62,7 +62,7 @@ def parse_args():
     tf_parser.set_defaults(execute_step=terraform_run)
     tfvar_parser = subparsers.add_parser(
         'tfvar',
-        help='create tfvar file wile lambda aliases'
+        help='create tfvar file with lambda aliases'
     )
     tfvar_parser.add_argument('input', help="dte.json configuration file")
     tfvar_parser.add_argument('output', help="destination for .tfvar file")
