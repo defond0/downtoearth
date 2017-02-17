@@ -54,7 +54,7 @@ def parse_args():
     tf_parser.add_argument(
         '-v',
         '--var',
-        const=None,
+        default='terraform.tfvars',
         help="name of varfile"
     )
     tf_parser.add_argument('input', help="dte.json configuration file")
