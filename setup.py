@@ -11,7 +11,8 @@ with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 install_requires = [
-    'jinja2>=2.9.5'
+    'jinja2>=2.9.5',
+    'boto3>=1.4.2'
 ]
 
 setup(name='downtoearth',
