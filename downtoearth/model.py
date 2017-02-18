@@ -109,7 +109,7 @@ class ApiModel(object):
             raise ValueError('Stage not in stages listed in json')
         lambda_client = boto3.client('lambda')
         name = self.lambda_name()
-        with open(self.json['LambdaZip'], 'w') as zip_:
+        with open(self.json['LambdaZip'], 'r') as zip_:
             code = lambda_client.update_function_code(
                 FunctionName=name,
                 ZipFile=zip_.read()
