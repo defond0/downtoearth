@@ -186,10 +186,13 @@ applies just because you fixed a bug in your code.
 
 Your stage aliases are initially set up to point to the $LATEST version.
 When you wanna push fresh code to a stage, publish a version of your
-code, update the alias to point to that version. We will soon provide a
-downtoearth cli command to help you deploy a zip to a stage, but for
-now, here's a little ``./deploy.sh STAGE`` script to help
+code, update the alias to point to that version.
+You can use this downtoearth cli command to help you deploy a zip to a stage
+.. code-block:: shell
 
+   downtoearth deploy INPUT_API_DEFITION_PATH STAGE
+
+here's a little ``./deploy.sh STAGE`` script that does roughly the same thing
 .. code-block:: shell
 
     #!/usr/bin/env bash
@@ -198,3 +201,17 @@ now, here's a little ``./deploy.sh STAGE`` script to help
     VERSION="$(aws lambda  --region=us-east-1 publish-version --function-name MY_FUNCTION_ROOT | jq -r .Version)"
     echo "Created version #$VERSION"
     aws lambda update-alias --function-name MY_FUNCTION_ROOT --name $STAGE --function-version $VERSION
+
+Now lets say you want to update you api with a new route. You have already used one of the above methods to update you lambda code, and now you want to apply your terraform to update your routes. In order to apply your newly generated terraform without changing the versions of the lambda code your aliases are pointing to, generate a tfvar file for the -var-file option of terraform apply. To do this simply use this downtoearth cli command
+.. code-block:: shell
+
+   downtoearth tfvar INPUT_API_DEFITION_PATH TFVAR_FILE_PATH
+
+Then when you can 
+.. code-block:: shell
+
+   terraform plan -var-file=TFVAR_FILE_PATH
+   terraform apply -var-file=TFVAR_FILE_PATH
+
+while holding your lambda aliases steady.
+
