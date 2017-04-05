@@ -52,15 +52,21 @@ class Router(object):
         route = "{}:{}".format(verb, path)
         self.add_full_route(route, delegate)
 
-    def route_request(self, event, context):
-        """Route incoming request."""
+    def route_request(self, event, context, include_event=True):
+        """Route incoming request.
+
+        Args:
+            include_event (bool, optional): include event as 'event' key in params dict
+                defaults to True
+        """
         func = self.route_map.get(event['route'])
         if not func:
             raise ValueError("{}: route not found".format(event["route"]))
         params = {}
         for param_type in self.param_order[::-1]:
             params.update(event.get(param_type, {}))
-        params['event'] = event
+        if include_event:
+            params['event'] = event
         result = func(**params)
         if result is None:
             raise NotFoundException('The resource could not be found.')
