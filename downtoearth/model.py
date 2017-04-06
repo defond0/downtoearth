@@ -1,4 +1,5 @@
 """downtoearth API model."""
+import hashlib
 import json
 import os
 try:
@@ -6,6 +7,7 @@ try:
 except ImportError: # no subprocess32 / Python 3 = safe to use subprocess
     import subprocess
 
+import boto3
 from jinja2 import PackageLoader, Environment
 
 from downtoearth import default
@@ -101,17 +103,60 @@ class ApiModel(object):
         template = self.jinja_env.get_template('root.hcl')
         return template.render(**self.get_api_template_variables())
 
-    def run_stage_deployments(self):
-        pass
+    def run_stage_deployment(self, stage):
+        """Deploy lambda code to stage"""
+        if stage not in self.json.get('Stages', ['production']):
+            raise ValueError('Stage not in stages listed in json')
+        lambda_client = boto3.client('lambda')
+        name = self.lambda_name()
+        with open(self.json['LambdaZip'], 'r') as zip_:
+            code = lambda_client.update_function_code(
+                FunctionName=name,
+                ZipFile=zip_.read()
+            )
+        version = lambda_client.publish_version(
+            CodeSha256=code['CodeSha256'],
+            Description='downtoearth stage {0} deploy'.format(stage),
+            FunctionName=name
+        )
+        lambda_client.update_alias(
+            FunctionName=name,
+            Name=stage,
+            FunctionVersion=version['Version'],
+            Description='downtoearth stage {0} deploy'.format(stage),
+        )
 
-    def run_terraform(self):
+    def lambda_name(self):
+        """Return lambda stage"""
+        return '{}_root'.format(self.name)
+
+    def get_lambda_versions_file(self, path):
+        """Save a tfvars file with current version of lambda stages"""
+        stages = self.json.get('Stages', ['production'])
+        name = self.lambda_name()
+        lambda_client = boto3.client('lambda')
+        intel = []
+        for stage in stages:
+            res = lambda_client.get_alias(
+                FunctionName=name,
+                Name=stage
+            )
+            intel.append(
+                '{0}_version={1}'.format(stage, res['FunctionVersion'])
+            )
+        with open(path, 'w')  as var_file:
+            var_file.write('\n'.join(intel))
+
+    def run_terraform(self, tfvar_file):
         """Return a apply terraform after template rendered."""
         path = os.path.dirname(self.args.output)
+        tfvar_file = os.path.join(path, tfvar_file)
+        self.get_lambda_versions_file(tfvar_file)
         affirm = ['true', 'y', 'yes']
         decline = ['', 'false', 'n', 'no']
         tf_cmds = {
-            'apply': 'terraform apply %s' % path,
-            'plan': 'terraform plan %s' % path
+            'apply': 'terraform apply -var-file={} {}'.format(tfvar_file, path),
+            'plan': 'terraform plan -var-file={} {}'.format(tfvar_file, path)
         }
         quit_cmds = ['q', 'quit']
         while True:
@@ -129,7 +174,6 @@ class ApiModel(object):
                 if tf_cmd.lower() in quit_cmds:
                     break
                 print('Try again.')
-                self.run_stage_deployments()
             return
         print('command to show plan:\n\t{}'.format(tf_cmds['plan']))
         print('command to apply:\n\t{}'.format(tf_cmds['apply']))
