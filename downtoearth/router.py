@@ -21,6 +21,7 @@ class Router(object):
             defaults to ['path', 'body', 'querystring']
     """
     DEFAULTS = {'param_order': ['path', 'body', 'querystring']}
+
     def __init__(self, route_map=None, param_order=None):
         if param_order is None:
             self.param_order = self.DEFAULTS['param_order']

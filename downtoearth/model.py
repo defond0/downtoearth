@@ -1,10 +1,10 @@
 """downtoearth API model."""
-import hashlib
 import json
 import os
+
 try:
     import subprocess32 as subprocess
-except ImportError: # no subprocess32 / Python 3 = safe to use subprocess
+except ImportError:  # no subprocess32 / Python 3 = safe to use subprocess
     import subprocess
 
 import boto3
@@ -22,6 +22,7 @@ except NameError as err:
 
 class ApiModel(object):
     """downtoearth data model."""
+
     def __init__(self, args):
         self.args = args
 
@@ -85,17 +86,6 @@ class ApiModel(object):
             ret['ROLE_TRUST'] = default.TRUST
 
         ret['ENDPOINTS'] = [e.get_endpoint_info(self.name) for e in self.get_endpoints()]
-
-        # TODO: build up endpoints
-        # ret['ENDPOINTS'] = [
-        #     {
-        #         "NAME": "test_resource",
-        #         "PATH_PART": "test",
-        #         "PARENT_RESOURCE_IDENTIFIER":
-        #             "PARENT_ID" if False else "aws_api_gateway_rest_api.%s.root_resource_id"% self.json['Name'],
-        #         "METHODS": [ "GET", "POST" ]
-        #     }
-        # ]
         return ret
 
     def render_terraform(self):
@@ -144,7 +134,7 @@ class ApiModel(object):
             intel.append(
                 '{0}_version={1}'.format(stage, res['FunctionVersion'])
             )
-        with open(path, 'w')  as var_file:
+        with open(path, 'w') as var_file:
             var_file.write('\n'.join(intel))
 
     def run_terraform(self, tfvar_file):

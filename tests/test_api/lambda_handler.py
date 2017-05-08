@@ -1,10 +1,10 @@
 def get_y(event, context):
     return dict(oh="yaaaaa!")
 
+
 function_mapping = {
     "GET:/api/Y": get_y
 }
-
 
 
 def route_request(event, context):
@@ -19,5 +19,5 @@ def route_request(event, context):
 
 
 def lambda_handler(event, context=None):
-    print("event: %s"%event)
+    print("event: %s" % event)
     return route_request(event, context)

@@ -79,7 +79,7 @@ install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
 lint: ## check style with flake8
-	flake8 downtoearth tests
+	PYFLAKES_NODOCTEST=1 flake8 downtoearth tests
 
 publish: req-publish-registry
 	python setup.py sdist upload -r $(PUBLISH_REGISTRY)
