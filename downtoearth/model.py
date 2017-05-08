@@ -86,17 +86,6 @@ class ApiModel(object):
             ret['ROLE_TRUST'] = default.TRUST
 
         ret['ENDPOINTS'] = [e.get_endpoint_info(self.name) for e in self.get_endpoints()]
-
-        # TODO: build up endpoints
-        # ret['ENDPOINTS'] = [
-        #     {
-        #         "NAME": "test_resource",
-        #         "PATH_PART": "test",
-        #         "PARENT_RESOURCE_IDENTIFIER":
-        #             "PARENT_ID" if False else "aws_api_gateway_rest_api.%s.root_resource_id"% self.json['Name'],
-        #         "METHODS": [ "GET", "POST" ]
-        #     }
-        # ]
         return ret
 
     def render_terraform(self):
