@@ -30,6 +30,7 @@ setup(name='downtoearth',
       setup_requires=['pytest-runner', ],
       tests_require=[
           'pytest',
+          'flake8'
       ],
       entry_points={
           'console_scripts': [
