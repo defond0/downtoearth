@@ -27,7 +27,7 @@ setup(name='downtoearth',
           'templates/*.hcl',
       ]},
       install_requires=install_requires,
-      setup_requires=['pytest-runner',],
+      setup_requires=['pytest-runner', ],
       tests_require=[
           'pytest',
       ],
@@ -36,4 +36,4 @@ setup(name='downtoearth',
               'downtoearth = downtoearth.cli:main',
           ]
       },
-     )
+      )

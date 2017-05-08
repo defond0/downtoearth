@@ -6,6 +6,8 @@ Usage:
     from downtoearth.exceptions import NotFoundException
     raise NotFoundException('your princess is in another castle')
 """
+
+
 class BadRequestException(Exception):
     def __init__(self, msg):
         prefix = '[Bad Request]'

@@ -24,7 +24,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.model.json['AuthType'], 'AWS_IAM')
 
     def test_can_output(self):
-        output=self.model.render_terraform()
+        output = self.model.render_terraform()
         test_dir = os.path.dirname(__file__)
         path = os.path.join(test_dir, 'test_api/', "main.tf")
         with open(path, "w") as f:

@@ -1,10 +1,10 @@
 """downtoearth API model."""
-import hashlib
 import json
 import os
+
 try:
     import subprocess32 as subprocess
-except ImportError: # no subprocess32 / Python 3 = safe to use subprocess
+except ImportError:  # no subprocess32 / Python 3 = safe to use subprocess
     import subprocess
 
 import boto3
@@ -22,6 +22,7 @@ except NameError as err:
 
 class ApiModel(object):
     """downtoearth data model."""
+
     def __init__(self, args):
         self.args = args
 
@@ -144,7 +145,7 @@ class ApiModel(object):
             intel.append(
                 '{0}_version={1}'.format(stage, res['FunctionVersion'])
             )
-        with open(path, 'w')  as var_file:
+        with open(path, 'w') as var_file:
             var_file.write('\n'.join(intel))
 
     def run_terraform(self, tfvar_file):

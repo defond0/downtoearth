@@ -70,6 +70,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def generate(args, model=None):
     model = model if model is not None else ApiModel(args)
     output = model.render_terraform()
@@ -78,24 +79,29 @@ def generate(args, model=None):
     if not args.quiet:
         print(output)
 
+
 def deploy(args):
     model = ApiModel(args)
     model.run_stage_deployment(args.stage)
 
+
 def terraform_var(args):
     model = ApiModel(args)
     model.get_lambda_versions_file(args.output)
+
 
 def terraform_run(args):
     model = ApiModel(args)
     generate(args, model)
     model.run_terraform(args.var)
 
+
 def main():
     """Build template and output to file."""
-    args=parse_args()
+    args = parse_args()
     if args.execute_step:
         args.execute_step(args)
+
 
 if __name__ == "__main__":
     main()
